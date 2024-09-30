@@ -1,0 +1,10 @@
+                                        &         model1
+                                        &         b/se/p
+w_environment_solar_taxcred_slp         &-2.347895|3.255976|.4708459
+ll                                      &      -100.1043
+r2                                      &               
+p                                       &       .4708459
+aic                                     &       202.2087
+bic                                     &       206.7352
+N                                       &            683
+risk                                    &           1502

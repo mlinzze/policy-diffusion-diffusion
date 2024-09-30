@@ -1,0 +1,61 @@
+;;;;;
+"For columns B and C, see sheet ""Net_generation_for_all_sectors"".";;;;;
+"For column E, see sheet ""Emission intensity"".";;;;;
+;;;;;
+;;;;"for generation";"for capacity"
+"State";"Share coal";"Share natural gas";"Dirtiest source";"metric tons/mWh";"metric tons/MW"
+"Alabama";13.7%;43.7%;"Coal";1.04;2,204.0
+"Alaska (1)";10.8%;52.4%;"Coal";1.04;548.7
+"Arizona";10.8%;47.4%;"Coal";1.04;2,438.0
+"Arkansas";27.4%;39.6%;"Coal";1.04;2,330.3
+"California";0.1%;43.6%;"Natural gas";0.44;965.6
+"Colorado";32.9%;30.0%;"Coal";1.04;1,922.1
+"Connecticut";0.0%;61.3%;"Natural gas";0.44;665.3
+"Delaware";-0.1%;91.3%;"Natural gas";0.44;314.6
+"District Of Columbia";0.0%;55.1%;"Natural gas";0.44;523.7
+"Florida";4.5%;75.8%;"Coal";1.04;1,974.6
+"Georgia";12.6%;46.9%;"Coal";1.04;1,990.7
+"Hawaii";0.0%;0.0%;"Petroleum";1.09;1,845.3
+"Idaho";0.0%;32.1%;"Natural gas";0.44;648.4
+"Illinois";15.3%;15.9%;"Coal";1.04;1,796.9
+"Indiana";45.0%;38.7%;"Coal";1.04;1,791.7
+"Iowa";23.4%;14.9%;"Coal";1.04;1,538.5
+"Kansas";27.5%;8.4%;"Coal";1.04;2,128.0
+"Kentucky";68.4%;23.1%;"Coal";1.04;602.7
+"Louisiana";5.0%;76.0%;"Coal";1.04;1,643.4
+"Maine";0.4%;29.4%;"Natural gas";0.44;638.9
+"Maryland";4.7%;42.5%;"Coal";1.04;1,430.0
+"Massachusetts";0.0%;76.1%;"Natural gas";0.44;669.8
+"Michigan";19.2%;45.7%;"Coal";1.04;1,265.1
+"Minnesota";22.1%;24.4%;"Coal";1.04;1,720.0
+"Mississippi";5.5%;75.9%;"Coal";1.04;1,647.7
+"Missouri";60.1%;13.5%;"Coal";1.04;1,745.5
+"Montana";44.8%;3.9%;"Coal";1.04;1,965.0
+"Nebraska";44.6%;5.8%;"Coal";1.04;1,852.5
+"Nevada";4.9%;58.1%;"Coal";1.04;2,724.0
+"New Hampshire";1.0%;25.7%;"Coal";1.04;1,739.8
+"New Jersey";0.0%;51.4%;"Natural gas";0.44;626.0
+"New Mexico";19.1%;35.2%;"Coal";1.04;2,410.5
+"New York";0.0%;47.7%;"Natural gas";0.44;569.8
+"North Carolina";11.0%;41.5%;"Coal";1.04;1,935.7
+"North Dakota (2)";55.2%;4.9%;"Coal";1.04;1,965.0
+"Ohio";23.8%;58.8%;"Coal";1.04;1,991.7
+"Oklahoma";5.8%;49.8%;"Coal";1.04;1,780.1
+"Oregon";0.0%;38.1%;"Natural gas";0.44;900.5
+"Pennsylvania";5.4%;59.0%;"Coal";1.04;1,390.7
+"Rhode Island";0.0%;89.2%;"Natural gas";0.44;615.8
+"South Carolina";14.9%;23.8%;"Coal";1.04;1,884.8
+"South Dakota";9.2%;13.9%;"Coal";1.04;2,087.8
+"Tennessee";19.9%;19.3%;"Coal";1.04;1,948.5
+"Texas";13.2%;51.1%;"Coal";1.04;2,059.9
+"Utah";47.2%;35.4%;"Coal";1.04;2,607.2
+"Vermont";0.0%;0.0%;"Renewables";0.00;0.0
+"Virginia";1.5%;56.0%;"Coal";1.04;1,695.2
+"Washington";4.1%;17.6%;"Coal";1.04;459.9
+"West Virginia (3)";85.6%;6.9%;"Coal";1.04;1,695.2
+"Wisconsin";32.6%;43.6%;"Coal";1.04;1,092.9
+"Wyoming";71.3%;5.1%;"Coal";1.04;2,110.5
+;;;;;
+"(1) Alaska didn't have utility-scale solar in 2022. We inserted the average capacity factor of Canada. Canada's capacity factor is 6% according to: https://www.eia.gov/outlooks/ieo/pdf/0484(2016).pdf";;;;;
+"(2) North Dakota didn't have utility-scale solar in 2022. We inserted the capacity factor of Montana.";;;;;
+"(3) West Virginia didn't have utility-scale solar in 2022. We inserted the capacity factor of Virginia.";;;;;

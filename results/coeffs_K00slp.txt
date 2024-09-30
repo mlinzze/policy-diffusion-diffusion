@@ -1,0 +1,10 @@
+                                        &         model1
+                                        &         b/se/p
+public_building_standards_slp           &-.45715|2.341172|.8451851
+ll                                      &      -140.5171
+r2                                      &               
+p                                       &       .8451851
+aic                                     &       283.0342
+bic                                     &        287.003
+N                                       &            391
+risk                                    &           1471

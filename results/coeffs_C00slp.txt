@@ -1,0 +1,10 @@
+                                        &         model1
+                                        &         b/se/p
+environment_ca_car_emission_slp         &2.987128|7.287283|.6818722
+ll                                      &      -63.82972
+r2                                      &               
+p                                       &       .6818722
+aic                                     &       129.6594
+bic                                     &       133.2542
+N                                       &            269
+risk                                    &           1817

@@ -1,0 +1,27 @@
+"Binary coding";"At least 5 states";"Post 1990";"Policy short";"Policy long";"Categories A";"Categories B";"Sector IPCC";"Categories C";"Comments to C"
+1;1;1;"netmeter_yearadopted_21";"On-site renewable generation";"Renewables";"Renewables";"Power";"Grants, subsidies, and other financial incentives";
+1;1;1;"environment_utility_deregulation_21";"Environmental utility deregulation";"Energy";;"Power";"Regulatory instruments";
+1;1;1;"fgd_21";"Fuel generation mix disclosure";"Renewables";"Renewables";"Power";"Information and education";
+1;1;1;"environment_publicbenefit_funds_21";"Public Benefit Fund";"Energy";"Renewables";"Power";"Grants, subsidies, and other financial incentives";"https://journals.plos.org/climate/article?id=10.1371/journal.pclm.0000073#:~:text=Twenty%2Dtwo%20American%20states%20plus,bills%20of%20individuals%20and%20firms."
+1;1;1;"public_building_standards";"Environmental Building Standards";"Sectoral";"Energy efficiency";"Building";"Regulatory instruments";
+1;1;1;"w4_gas_decoupling_21";"Gas decoupling";"Energy";;"Power";"Grants, subsidies, and other financial incentives";"""Does the state compensate utilities for selling less gas?"""
+1;1;1;"w4_electric_decoupling_21";"Electric decoupling";"Energy";;"Power";"Grants, subsidies, and other financial incentives";"""Does the state compensate utilities for selling less electricity?"""
+1;1;1;"climate_action_plan_21";"Climate action plan";"GHG emissions";;"Multi";"Policy support";
+1;1;1;"w_mgpo_21";"Mandatory green power option";"Renewables";"Renewables";"Power";"Regulatory instruments";
+1;1;1;"w_ghg_targets_21";"GHG target";"GHG emissions";;"Multi";"Policy support";
+1;1;1;"w_ee_21";"Energy efficiency target";"Energy";"Energy efficiency";"Building";"Policy support";
+1;1;1;"environment_CA_car_emissions_standards_21";"CA Car Emissions Standard";"Sectoral";;"Transport";"Regulatory instruments";
+1;1;1;"environment_ghg_cap_21";"Greenhouse Gas Cap";"GHG emissions";;"Power";"Carbon pricing";
+1;1;1;"w_gg_rr_21";"Greenhouse gas registry/ reporting";"GHG emissions";;"Power";"Information and education";
+1;1;1;"ghg_standards_21";"Emissions performance standards";"GHG emissions";;"Power";"Regulatory instruments";
+1;1;1;"w_low_income_ee_21";"Low-income energy efficiency programs";"Energy";"Energy efficiency";"Building";"Grants, subsidies, and other financial incentives";
+1;1;1;"community_solar";"Community Solar";"Renewables";"Renewables";"Power";"Grants, subsidies, and other financial incentives";
+0;1;1;"z_gasoline_tax";"Gas tax";"Sectoral";;"Transport";"Grants, subsidies, and other financial incentives";
+1;1;0;"w_environment_state_nepas_21";"Environmental Policy Act";"General";;"Multi";"Policy support";"Category C not so clear"
+0;1;1;"x_eers";"Energy efficiency resource standard (continuous)";"Energy";;"Power";"Regulatory instruments";
+1;1;0;"w_complete_streets_21";"Complete Streets Policies";"Sectoral";;"Transport";"Procurement and investment";
+1;1;0;"pace_21";"PACE authorization";"Energy";;"Building";"Grants, subsidies, and other financial incentives";
+0;1;1;"x_RPS_targets_bindingonly";"RPS target (binding only)";"Renewables";;"Power";"Regulatory instruments";
+1;1;0;"w4_environment_state_rps_21";"Renewable Portfolio Standard";"Renewables";;"Power";"Regulatory instruments";
+1;1;0;"w_Environment_Solar_TaxCredit_21";"Solar Tax Credit";"Renewables";;"Power";"Grants, subsidies, and other financial incentives";
+1;0;1;"environment_preemption_naturalgasbans";"State preemption of local gas bans";"Sectoral";;"Building";"Regulatory instruments";

@@ -1,0 +1,10 @@
+                                        &         model1
+                                        &         b/se/p
+environment_publicbenefit_f_slp         &-6.886523|4.934548|.162843
+ll                                      &      -87.13597
+r2                                      &               
+p                                       &        .162843
+aic                                     &       176.2719
+bic                                     &       180.2042
+N                                       &            377
+risk                                    &           1609

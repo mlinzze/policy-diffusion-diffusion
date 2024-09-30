@@ -1,0 +1,10 @@
+                                        &         model1
+                                        &         b/se/p
+environment_utility_deregul_slp         &-3.808723|4.848615|.4321441
+ll                                      &      -63.69745
+r2                                      &               
+p                                       &       .4321441
+aic                                     &       129.3949
+bic                                     &       133.0007
+N                                       &            272
+risk                                    &           1684
