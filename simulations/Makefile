@@ -5,6 +5,7 @@ install:
 	make clean
 	c++ -c functions.c -lm -ldl -o functions.o
 	c++ montecarlo.c -I${NETCDF_HOME}/include -I./ -L${NETCDF_HOME}/lib -L./ -lm -ldl -o montecarlo.x functions.o
+	c++ montecarlo_initial.c -I${NETCDF_HOME}/include -I./ -L${NETCDF_HOME}/lib -L./ -lm -ldl -o montecarlo_initial.x functions.o
 
 set0:
 	make install
@@ -86,10 +87,28 @@ set1:
 	./montecarlo.x slpm linear future_2050 none counterfactual 10 5
 	./montecarlo.x slpm linear future_2050 none counterfactual 10 9
 
+set2:
+	make install
+	./montecarlo_initial.x slpm linear future_2050 0 counterfactual 5 9
+	./montecarlo_initial.x slpm linear future_2050 1 counterfactual 5 9
+	./montecarlo_initial.x slpm linear future_2050 3 counterfactual 5 9
+	./montecarlo_initial.x slpm linear future_2050 5 counterfactual 5 9
+	./montecarlo_initial.x slpm linear future_2050 10 counterfactual 5 9
+	./montecarlo_initial.x slpm linear future_2050 20 counterfactual 5 9
+	./montecarlo_initial.x slpm linear future_2050 30 counterfactual 5 9
+	./montecarlo_initial.x slpm linear future_2050 0 treatment 5 9
+	./montecarlo_initial.x slpm linear future_2050 1 treatment 5 9
+	./montecarlo_initial.x slpm linear future_2050 3 treatment 5 9
+	./montecarlo_initial.x slpm linear future_2050 5 treatment 5 9
+	./montecarlo_initial.x slpm linear future_2050 10 treatment 5 9
+	./montecarlo_initial.x slpm linear future_2050 20 treatment 5 9
+	./montecarlo_initial.x slpm linear future_2050 30 treatment 5 9
+
 all:
 	make install
 	make set0
 	make set1
+	make set2
 
 clean:
 	rm -f functions.o

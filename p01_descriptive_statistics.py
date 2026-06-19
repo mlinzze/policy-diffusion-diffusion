@@ -116,6 +116,146 @@ df_desc.to_latex(buf=os.path.join(TABLEPATH, tablefile), index=False, encoding='
 
 ## ============================================================
 
+import numpy as np
+import textwrap
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+
+df_policy = pd.read_csv(os.path.join(DATAPATH, 'data_policies.csv'))
+
+policy_cols = df_policy.columns.difference(['state', 'year'])
+
+highlight_policies = [
+	'environment_preemption_naturalgasbans',
+	'w_environment_state_nepas_21',
+	'w_low_income_ee_21'
+]
+
+df_first = (
+	df_policy
+	.melt(
+		id_vars=['state', 'year'],
+		value_vars=policy_cols,
+		var_name='policy',
+		value_name='adopted'
+	)
+	.query('adopted == 1')
+	.groupby(['state', 'policy'], as_index=False)['year']
+	.min()
+	.rename(columns={'year': 'first_adoption_year'})
+)
+
+df_first_1980 = df_first.loc[df_first['first_adoption_year'] >= 1980].copy()
+
+df_unique_states = (
+	df_first_1980
+	.groupby('policy', as_index=False)['state']
+	.nunique()
+	.rename(columns={'state': 'n_unique_adopting_states'})
+)
+
+df_unique_years = (
+	df_first_1980
+	.groupby('policy', as_index=False)['first_adoption_year']
+	.nunique()
+	.rename(columns={'first_adoption_year': 'n_unique_first_adoption_years'})
+)
+
+df_policies = pd.read_csv(os.path.join(DATAPATH, 'policygroups.csv'), sep=';')
+df_policies = (
+	df_policies
+	.loc[df_policies['Binary coding'] == 1, ['Policy short', 'Policy long', 'Categories C']]
+	.rename(columns={
+		'Policy short': 'policy',
+		'Policy long': 'policy_long',
+		'Categories C': 'category'
+	})
+)
+
+df_scatter = (
+	df_unique_states
+	.merge(df_unique_years, on='policy')
+	.merge(df_policies, on='policy', how='left')
+	.sort_values(['n_unique_adopting_states', 'n_unique_first_adoption_years'], ascending=False)
+	.reset_index(drop=True)
+)
+
+df_scatter['policy_label'] = df_scatter['policy_long'].fillna(df_scatter['policy'])
+df_scatter['plot_id'] = np.arange(1, len(df_scatter) + 1)
+df_scatter['is_highlight'] = df_scatter['policy'].isin(highlight_policies)
+
+fig, ax = plt.subplots(figsize=(6, 6))
+
+ax.scatter(
+	df_scatter.loc[~df_scatter['is_highlight'], 'n_unique_first_adoption_years'],
+	df_scatter.loc[~df_scatter['is_highlight'], 'n_unique_adopting_states'],
+	s=140,
+	alpha=0.75,
+	edgecolor='black',
+	linewidth=0.7
+)
+
+ax.scatter(
+	df_scatter.loc[df_scatter['is_highlight'], 'n_unique_first_adoption_years'],
+	df_scatter.loc[df_scatter['is_highlight'], 'n_unique_adopting_states'],
+	s=220,
+	alpha=0.95,
+	color='red',
+	edgecolor='black',
+	linewidth=0.9
+)
+
+for _, r in df_scatter.iterrows():
+	ax.text(
+		r['n_unique_first_adoption_years'],
+		r['n_unique_adopting_states'],
+		str(r['plot_id']),
+		ha='center',
+		va='center',
+		fontsize=8,
+		color='white' if r['is_highlight'] else 'black',
+		fontweight='bold' if r['is_highlight'] else 'normal'
+	)
+
+ax.set_xlabel('Number of unique first-adoption years')
+ax.set_ylabel('Number of unique adopting states')
+#ax.set_title('Policy adoption: diffusion across states and years')
+
+ax.grid(True, alpha=0.3)
+ax.spines[['top', 'right']].set_visible(False)
+
+legend_handles = [
+	Line2D(
+		[0], [0],
+		marker='o',
+		color='none',
+		markerfacecolor='red' if r['is_highlight'] else 'white',
+		markeredgecolor='black',
+		markersize=8,
+		label=f"{r['plot_id']}. {textwrap.fill(r['policy_label'], 38)}"
+	)
+	for _, r in df_scatter.iterrows()
+]
+
+ax.set_xticks(np.arange(2., 18. + 2, 2.))
+
+ax.legend(
+	handles=legend_handles,
+	title='Policy',
+	loc='upper left',
+	bbox_to_anchor=(1.02, 1),
+	frameon=False,
+	fontsize=7,
+	title_fontsize=9,
+	labelspacing=0.9
+)
+
+sns.despine(ax=ax, offset=1., right=True, top=True, left=False)
+fig.savefig(os.path.join(FIGUREPATH, 'policies_scatter.pdf'), bbox_inches='tight', transparent=True)
+fig.savefig(os.path.join(FIGUREPATH, 'policies_scatter.png'), bbox_inches='tight', transparent=True)
+
+## ============================================================
+
 policies_drop = ['environment_preemption_naturalgasbans', 'w_environment_state_nepas_21', 'w_low_income_ee_21']
 df_policies = pd.read_csv(os.path.join(DATAPATH, 'policygroups.csv'), sep=';')
 df_policies = df_policies.loc[df_policies['Binary coding'] == 1, :].loc[:, ['Policy short', 'Policy long', 'Categories C']]

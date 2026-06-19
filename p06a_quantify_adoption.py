@@ -176,3 +176,102 @@ for year in [2030, 2050]:
 	fig.savefig(os.path.join(FIGUREPATH, 'scatter_sensitivity_{0:d}.pdf'.format(year)), bbox_inches='tight', dpi=300., transparent=True)
 
 ## ========================================================================================== ##
+
+## ============================
+## line plot: sensitivity of share indirect > direct
+## ============================
+
+## ============================
+## line plot: share indirect > direct by beta_W
+## default baseline hazard only
+## ============================
+
+METRIC = 'slpm'
+POLICIES = 'none'
+emission_scenario = 'constant'
+
+I = 5 # default baseline hazard = 0.05
+J_LIST = [1, 2, 3, 4, 5]
+
+BETA_W = 1.95
+beta_Ws = [1., 2., 3., 4., 5.]
+
+def get_beta_W(ij):
+	if J_LIST[ij] == 9:
+		return BETA_W
+	return beta_Ws[ij]
+
+results_path = os.path.join(
+	'./simulations',
+	'results_{0:s}_linear_future_2050_{1:s}'.format(METRIC, POLICIES)
+)
+
+rows = []
+
+for ij, j in enumerate(J_LIST):
+
+	filename = os.path.join(
+		results_path,
+		'emission_reductions_{0:s}_{1:s}_{2:s}_{3:d}_{4:d}.csv'.format(
+			emission_scenario, METRIC, POLICIES, I, j
+		)
+	)
+
+	if not os.path.exists(filename):
+		print('Missing file:', filename)
+		continue
+
+	df = pd.read_csv(filename)
+
+	rows.append({
+		'j': j,
+		'beta_W': get_beta_W(ij),
+		'share_indirect_larger': 100. * (df['indirect'] > df['direct']).mean()
+	})
+
+df_beta = pd.DataFrame(rows)
+df_beta = df_beta.sort_values(by='beta_W').reset_index(drop=True)
+
+print(df_beta)
+
+fig, ax = plt.subplots(figsize=(5,4))
+
+ax.plot(
+	df_beta['beta_W'],
+	df_beta['share_indirect_larger'],
+	marker='o',
+	ms=5,
+	lw=1.5,
+	color='black'
+)
+
+ax.axvline(BETA_W, color='red', lw=1., ls='--')
+ax.annotate(
+	text=r'Empirical $\beta_W$',
+	xy=(BETA_W + 0.1, ax.get_ylim()[1]),
+	xycoords='data',
+	ha='left',
+	va='bottom',
+	color='red',
+	size='medium'
+)
+
+ax.set_xlabel(r'Diffusion parameter $\beta_W$')
+ax.set_ylabel('States with indirect > direct emissions (%)')
+ax.set_ylim(0, 100)
+
+sns.despine(ax=ax, offset=1., right=True, top=True)
+
+fig.savefig(
+	os.path.join(FIGUREPATH, 'line_indirect_larger_by_beta_{0:s}_{1:s}.pdf'.format(METRIC, emission_scenario)),
+	bbox_inches='tight',
+	dpi=300.,
+	transparent=True
+)
+
+fig.savefig(
+	os.path.join(FIGUREPATH, 'line_indirect_larger_by_beta_{0:s}_{1:s}.png'.format(METRIC, emission_scenario)),
+	bbox_inches='tight',
+	dpi=300.,
+	transparent=True
+)

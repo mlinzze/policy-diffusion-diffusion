@@ -9,7 +9,6 @@ import itertools
 import numpy as np
 import pandas as pd
 
-
 ## ============================================================
 
 from parameters import *
@@ -20,9 +19,17 @@ FIRSTYEAR = 2024
 LASTYEAR = 2050
 
 METRIC = 'slpm'
-
 SIMULATIONS_PATH = './simulations/'
-EXPERIMENT = 'results_{0:s}_linear_future_2050_none'.format(METRIC)
+
+## main simulations with existing policies
+POLICIES_MAIN = ['0', '1', '3', '5', '10', '20', '30']
+
+## sensitivity simulations with no existing policies
+POLICIES_SENSITIVITY = ['none']
+I_SENSITIVITY = list(range(1, 10+1, 1))
+J_SENSITIVITY = list(range(0, 5+1, 1)) + [9]
+
+EFFECT_SIZE = 0.01
 
 ## ============================
 
@@ -56,7 +63,7 @@ df_ghg['emissions'] = df_ghg['emissions'].astype(float)
 df_ghg['year'] = df_ghg['year'].astype(int)
 
 df_ghg = df_ghg.sort_values(by=['stateabbr', 'year'], ascending=True, ignore_index=True)
-df_ghg['growth_trend'] = (df_ghg['emissions']/df_ghg.groupby('stateabbr')['emissions'].shift(SHIFT_DELTA))**(1/ SHIFT_DELTA)
+df_ghg['growth_trend'] = (df_ghg['emissions']/df_ghg.groupby('stateabbr')['emissions'].shift(SHIFT_DELTA))**(1/SHIFT_DELTA)
 
 df_ghg = df_ghg.loc[df_ghg['year'] == df_ghg['year'].max(), :]
 df_ghg['year'] = FIRSTYEAR
@@ -74,70 +81,199 @@ df_ghg['growth_trend_cumulative'] = df_ghg.groupby('stateabbr')['growth_trend'].
 df_ghg['emissions_trend'] = df_ghg.apply(lambda x: state2baseline[x['stateabbr']] * x['growth_trend_cumulative'], axis=1)
 
 df_ghg = df_ghg.drop(columns=['emissions', 'growth_trend_cumulative'])
-
 df_ghg.to_csv(os.path.join(RESULTPATH, 'emission_scenarios.csv'), index=False)
 
 ## ============================
+## define simulation tasks
 
-I = 5 # baseline probability = 0.05
-J = 9 # diffusion coefficient = empirical
+simulation_tasks = []
 
-EFFECT_SIZE = 0.01
+for POLICIES in POLICIES_MAIN:
+	simulation_tasks.append({
+		'POLICIES': POLICIES,
+		'I': 5,
+		'J': 9
+	})
 
-for emission_scenario in ['constant', 'trend']:
+for POLICIES in POLICIES_SENSITIVITY:
+	for I in I_SENSITIVITY:
+		for J in J_SENSITIVITY:
+			simulation_tasks.append({
+				'POLICIES': POLICIES,
+				'I': I,
+				'J': J
+			})
 
-	## ============================
+## ============================
 
+for task in simulation_tasks:
+
+	POLICIES = task['POLICIES']
+	I = task['I']
+	J = task['J']
+
+	EXPERIMENT = 'results_{0:s}_linear_future_2050_{1:s}'.format(METRIC, POLICIES)
 	results_path = os.path.join(SIMULATIONS_PATH, EXPERIMENT)
 
-	df = pd.read_csv(os.path.join(results_path, 'result_{0:s}_{1:d}_{2:d}_{3:d}.csv'.format('ANY', 0, I, J)), names=['year', 'stateabbr', 'control'])
+	if not os.path.exists(results_path):
+		print('Path does not exist:', results_path)
+		continue
 
-	for stateabbr in states:
+	for emission_scenario in ['constant', 'trend']:
 
-		df1 = pd.read_csv(os.path.join(results_path, 'result_{0:s}_{1:d}_{2:d}_{3:d}.csv'.format(stateabbr, 1, I, J)), names=['year', 'stateabbr', stateabbr])
-		df = df.merge(df1, on=['stateabbr', 'year'])
+		growth = 'growth_' + emission_scenario
+		emissions = 'emissions_' + emission_scenario
 
-	df = df.loc[df['stateabbr'].isin(states), :]
-	df = df.loc[df['year'].between(FIRSTYEAR, LASTYEAR), :]
-	df = df.sort_values(by=['stateabbr', 'year'], ascending=True).reset_index(drop=True)
-	df = df.set_index(['stateabbr', 'year'])
+		df_ghg = pd.read_csv(os.path.join(RESULTPATH, 'emission_scenarios.csv'))
+		df_ghg = df_ghg.sort_values(by=['stateabbr', 'year'], ascending=True).reset_index(drop=True)
+		df_ghg = df_ghg.set_index(['stateabbr', 'year'])
 
-	## ============================
+		df_ghg['growth_treated'] = df_ghg[growth] - EFFECT_SIZE
 
-	growth = 'growth_' + emission_scenario
-	emissions = 'emissions_' + emission_scenario
+		reduction_rows = []
 
-	df_ghg = pd.read_csv(os.path.join(RESULTPATH, 'emission_scenarios.csv'))
-	df_ghg = df_ghg.sort_values(by=['stateabbr', 'year'], ascending=True).reset_index(drop=True)
-	df_ghg = df_ghg.set_index(['stateabbr', 'year'])
+		for year in range(FIRSTYEAR, LASTYEAR, 1):
 
-	df_ghg['growth_treated'] = df_ghg[growth] - EFFECT_SIZE
+			print(POLICIES, I, J, emission_scenario, year)
 
-	for year in range(FIRSTYEAR, LASTYEAR, 1):
+			df_tmp = df_ghg.copy()
 
-		print(year)
-		index = df_ghg.index.get_level_values('year') == year
-		df_ghg['emissions_baseline'] = np.nan
-		df_ghg.loc[index, 'emissions_baseline'] = df_ghg.loc[index, emissions]
-		df_ghg['emissions_baseline'] = df_ghg.groupby('stateabbr')['emissions_baseline'].ffill()
-		df_ghg.loc[index, 'growth_treated_cumulative'] = 1.
+			index_year = df_tmp.index.get_level_values('year') == year
+			df_tmp['emissions_baseline'] = np.nan
+			df_tmp.loc[index_year, 'emissions_baseline'] = df_tmp.loc[index_year, emissions]
+			df_tmp['emissions_baseline'] = df_tmp.groupby('stateabbr')['emissions_baseline'].ffill()
 
-		index = df_ghg.index.get_level_values('year') > year
-		df_ghg.loc[index, 'growth_treated_cumulative'] = df_ghg.loc[index, :].groupby('stateabbr')['growth_treated'].transform(lambda x: x.cumprod())
-		df_ghg['emissions_treated'] = df_ghg['emissions_baseline'] * df_ghg['growth_treated_cumulative']
+			df_tmp['growth_treated_cumulative'] = np.nan
+			df_tmp.loc[index_year, 'growth_treated_cumulative'] = 1.
 
-		reductions = df_ghg.loc[index, :].groupby('stateabbr')[emissions].sum() - df_ghg.loc[index, :].groupby('stateabbr')['emissions_treated'].sum()
+			index_future = df_tmp.index.get_level_values('year') > year
+			df_tmp.loc[index_future, 'growth_treated_cumulative'] = (
+				df_tmp.loc[index_future, :]
+				.groupby('stateabbr')['growth_treated']
+				.transform(lambda x: x.cumprod())
+			)
 
-		index = df.index.get_level_values('year') == year
-		df.loc[index, :] = df.loc[index, :].multiply(reductions.values, axis='index')
+			df_tmp['emissions_treated'] = (
+				df_tmp['emissions_baseline']
+				* df_tmp['growth_treated_cumulative']
+			)
 
-	df_results = pd.DataFrame({'stateabbr': states})
-	df_results = df_results.set_index('stateabbr')
+			reductions = (
+				df_tmp.loc[index_future, :]
+				.groupby('stateabbr')[emissions].sum()
+				- df_tmp.loc[index_future, :]
+				.groupby('stateabbr')['emissions_treated'].sum()
+			)
 
-	for stateabbr in states:
+			df_reductions_year = reductions.reset_index()
+			df_reductions_year.columns = ['stateabbr', 'reduction']
+			df_reductions_year['year'] = year
+			reduction_rows.append(df_reductions_year)
 
-		df_results.loc[stateabbr, 'direct'] = df.loc[df.index.get_level_values('stateabbr') == stateabbr, stateabbr].sum(axis=0)
-		df_results.loc[stateabbr, 'indirect'] = df.loc[df.index.get_level_values('stateabbr') != stateabbr, stateabbr].sum(axis=0) -\
-											df.loc[df.index.get_level_values('stateabbr') != stateabbr, 'control'].sum(axis=0)
+		df_reductions = pd.concat(reduction_rows, ignore_index=True)
 
-	df_results.to_csv(os.path.join(results_path, 'emission_reductions_{0:s}_{1:s}.csv'.format(emission_scenario, METRIC)))
+		df_results = pd.DataFrame({'stateabbr': states})
+		df_results = df_results.set_index('stateabbr')
+
+		for stateabbr in states:
+
+			filename_treat = os.path.join(
+				results_path,
+				'result_{0:s}_{1:d}_{2:d}_{3:d}.csv'.format(stateabbr, 1, I, J)
+			)
+
+			if POLICIES == 'none':
+				filename_control = os.path.join(
+					results_path,
+					'result_{0:s}_{1:d}_{2:d}_{3:d}.csv'.format('ANY', 0, I, J)
+				)
+			else:
+				filename_control = os.path.join(
+					results_path,
+					'result_{0:s}_{1:d}_{2:d}_{3:d}.csv'.format(stateabbr, 0, I, J)
+				)
+
+			if not os.path.exists(filename_treat):
+				print('Missing treatment file:', filename_treat)
+				continue
+
+			if not os.path.exists(filename_control):
+				print('Missing control file:', filename_control)
+				continue
+
+			df_treat = pd.read_csv(
+				filename_treat,
+				names=['year', 'stateabbr', 'treatment']
+			)
+
+			df_control = pd.read_csv(
+				filename_control,
+				names=['year', 'stateabbr', 'control']
+			)
+
+			df = df_treat.merge(df_control, on=['stateabbr', 'year'])
+
+			df = df.loc[df['stateabbr'].isin(states), :]
+			df = df.loc[df['year'].between(FIRSTYEAR, LASTYEAR), :]
+			df = df.merge(df_reductions, on=['stateabbr', 'year'], how='left')
+			df['reduction'] = df['reduction'].fillna(0.)
+
+			df['treatment'] = df['treatment'] * df['reduction']
+			df['control'] = df['control'] * df['reduction']
+
+			index_direct = df['stateabbr'] == stateabbr
+			index_indirect = df['stateabbr'] != stateabbr
+
+			if POLICIES == 'none':
+				df_results.loc[stateabbr, 'direct'] = df.loc[index_direct, 'treatment'].sum()
+			else:
+				df_results.loc[stateabbr, 'direct'] = (
+					df.loc[index_direct, 'treatment'].sum()
+					- df.loc[index_direct, 'control'].sum()
+				)
+
+			df_results.loc[stateabbr, 'indirect'] = (
+				df.loc[index_indirect, 'treatment'].sum()
+				- df.loc[index_indirect, 'control'].sum()
+			)
+
+			df_results.loc[stateabbr, 'direct_treatment'] = df.loc[index_direct, 'treatment'].sum()
+			df_results.loc[stateabbr, 'direct_control'] = df.loc[index_direct, 'control'].sum()
+			df_results.loc[stateabbr, 'indirect_treatment'] = df.loc[index_indirect, 'treatment'].sum()
+			df_results.loc[stateabbr, 'indirect_control'] = df.loc[index_indirect, 'control'].sum()
+
+		print(POLICIES, I, J, emission_scenario)
+		print(df_results[['direct', 'indirect']].describe())
+		print('Share indirect > direct:', (df_results['indirect'] > df_results['direct']).mean())
+
+		## full filename, used for sensitivity plots
+		df_results.to_csv(
+			os.path.join(
+				results_path,
+				'emission_reductions_{0:s}_{1:s}_{2:s}_{3:d}_{4:d}.csv'.format(
+					emission_scenario, METRIC, POLICIES, I, J
+				)
+			)
+		)
+
+		## backward-compatible filename for existing-policy plots
+		if POLICIES != 'none' and I == 5 and J == 9:
+			df_results.to_csv(
+				os.path.join(
+					results_path,
+					'emission_reductions_{0:s}_{1:s}_{2:s}.csv'.format(
+						emission_scenario, METRIC, POLICIES
+					)
+				)
+			)
+
+		## backward-compatible filename for old none default case
+		if POLICIES == 'none' and I == 5 and J == 9:
+			df_results.to_csv(
+				os.path.join(
+					results_path,
+					'emission_reductions_{0:s}_{1:s}.csv'.format(
+						emission_scenario, METRIC
+					)
+				)
+			)
